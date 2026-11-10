@@ -10,16 +10,26 @@
 
 | skill | 做什麼 | 什麼時候叫 |
 |---|---|---|
-| [`route-work`](skills/route-work/SKILL.md) | 省流分工：誰做什麼、用哪個等級的模型、工單多大 | 要派工、用量燒很快 |
-| [`brief`](skills/brief/SKILL.md) | 把使用者的一句話變成工人做得對的工單：先討論、原話不轉述、翻成數字 | 派工之前 |
+| [`route-work`](skills/route-work/SKILL.md) | 省流分工：誰做什麼、用哪個等級的模型、工單多大；總指揮不讀長文，交給只讀工單的無頭工人 | 要派工、用量燒很快 |
+| [`brief`](skills/brief/SKILL.md) | 把使用者的一句話變成工人做得對的工單：先討論、原話不轉述、翻成數字；送出前讓零上下文的「金魚」讀一次抓漏洞 | 派工之前 |
 | [`project-docs`](skills/project-docs/SKILL.md) | 每個 repo 四份文件（需求、骨架、計畫、技債）＋三四個功能重構一輪 | 開新專案、接手舊專案 |
 | [`verify`](skills/verify/SKILL.md) | 說「做完了」之前：對清單、讀 diff、要證據 | 收到工人回報之後 |
 | [`design-handoff`](skills/design-handoff/SKILL.md) | 設計交接：可以點的草圖、說出「那一下」、幫效果取名字、美術指導跟施工分開 | 介面改版、動態效果 |
-| [`slim-context`](skills/slim-context/SKILL.md) | 精簡 token：量開機讀多少、分必讀／浮現／需要才讀、規則跟紀錄分開、日誌滾動 | 用量燒很快、agent 越用越笨 |
+| [`slim-context`](skills/slim-context/SKILL.md) | 精簡 token：量開機讀多少、分必讀／浮現／需要才讀、規則跟紀錄分開、日誌滾動；上下文過半自己摘要、自己換窗 | 用量燒很快、agent 越用越笨 |
 | [`chapter-digest`](skills/chapter-digest/SKILL.md) | 歸納章節重點：先逐字摘錄、再用自己的話講、接到讀者身上、留一個問題；寫成文章再逐條對原文 | 一起讀書、整理文件、改寫官方文章 |
 | [`nightly-dream`](skills/nightly-dream/SKILL.md) | 每日做夢：收工後便宜的模型只讀重看當天對話，列出沒記到／過時矛盾／答應沒做，隔天主 agent 決定怎麼改 | agent 常忘記講過的事、答應的沒人做 |
 
 每個都可以單獨用，彼此不互相引用。
+
+## 最省的三個做法
+
+1. **總指揮不讀長文，交給無頭工人**（`route-work`）：要改檔、掃 repo、讀 log，就寫工單開一個全新的無頭工人（例如 `claude -p`）。工人只讀工單、不讀整段對話，回一段短結果；總指揮的上下文只留決定跟驗收。
+   官方：「Keep the expensive model's context for the decisions, and let cheaper subagents do the verbose reading.」
+   https://claude.dev/blog/which-claude-model-should-you-build-with/
+2. **上下文過半自己摘要換窗、每晚做夢**（`slim-context`、`nightly-dream`）：過 50% 就把重點寫進檔案、開新對話，不拖著一大段逐字稿；每天收工讓小模型重讀當天對話，只列出沒記到、過時、答應沒做的。
+   官方：https://www.anthropic.com/research/components-of-agent-memory
+3. **送出前讓金魚讀一次**（`brief`）：總指揮是大象，什麼都記得，所以看不到自己漏寫什麼。工單送出前給一個零上下文的模型讀，看不懂的先補，比工人做兩次便宜。
+   原文：https://github.com/google/elephant-goldfish-model
 
 ## 安裝
 
@@ -58,14 +68,20 @@ Distilled from how we actually work every day: a lead agent talks with the user,
 
 | skill | what it does |
 |---|---|
-| `route-work` | Who does what, which model tier, how big a work order should be. Comes with a `ROLES.md` table you fill in. |
-| `brief` | Turn one sentence from the user into a work order a worker gets right: discuss first, quote the user verbatim (never paraphrase imagery), translate every line into numbers. |
+| `route-work` | Who does what, which model tier, how big a work order should be. The lead never does the long reading: headless workers see only the work order. Comes with a `ROLES.md` table you fill in. |
+| `brief` | Turn one sentence from the user into a work order a worker gets right: discuss first, quote the user verbatim (never paraphrase imagery), translate every line into numbers. Before sending, a zero-context "goldfish" reads it and flags gaps (Elephant & Goldfish). |
 | `project-docs` | Four docs per repo (PRD, architecture, plan, tech debt), an audit brief for existing repos, and a refactor round every 3–4 features. |
 | `verify` | Before saying "done": check the acceptance list, read the diff, demand evidence, surface what wasn't verified. |
 | `design-handoff` | Clickable sketches first, name the one moment that moves, build a shared vocabulary of effects, separate the art director from the builder, verify motion with video. |
-| `slim-context` | Measure what the agent reads at startup, split memory into always / recalled / on-demand, separate rules from logs, roll the journal, read only the lines you need. |
+| `slim-context` | Measure what the agent reads at startup, split memory into always / recalled / on-demand, separate rules from logs, roll the journal, read only the lines you need. Past 50% context, save what matters and hand off to a fresh session. |
 | `chapter-digest` | Summarize a chapter or long document: verbatim excerpts with locations first, then your own words, a link to the reader, one genuine question; check every claim against the source before publishing. |
 | `nightly-dream` | After hours, a cheap read-only model re-reads the day's conversation against the memory files and lists what wasn't saved, what's stale or contradictory, and what was promised but not done. The lead agent decides what to change. |
+
+**Three biggest savings**
+
+1. **The lead never does the long reading** (`route-work`). Edits, repo scans and log reading go out as work orders to fresh headless workers (e.g. `claude -p`) that see only the order, not the conversation. "Keep the expensive model's context for the decisions, and let cheaper subagents do the verbose reading." https://claude.dev/blog/which-claude-model-should-you-build-with/
+2. **Hand off at 50% context, dream at night** (`slim-context`, `nightly-dream`). Past half the window, save what matters to files and start a fresh session; after hours, a small model re-reads the day and lists what wasn't saved, what's stale, and what was promised but not done. https://www.anthropic.com/research/components-of-agent-memory
+3. **Let a goldfish read the brief first** (`brief`). The lead remembers everything, so it can't see what it forgot to write down. A zero-context model reads each work order before it ships and flags the gaps. https://github.com/google/elephant-goldfish-model
 
 **Install**: copy the folders in `skills/` into `~/.claude/skills/` (all projects) or `<project>/.claude/skills/` (one project). Invoke with `/brief`, `/verify`, etc.
 

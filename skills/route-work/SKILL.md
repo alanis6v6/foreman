@@ -28,8 +28,21 @@ disable-model-invocation: true
 4. **一張工單一個大功能、最多三件事**。估計超過 30 分鐘就拆；先做使用者最想看的那一半。
 5. **每張工單、每次叫別的模型，第一句寫它唯一的職責**：「你的唯一職責：……」。角色寫模糊的時候，模型對「自己人」跟「外人」的差別待遇最大，寫清楚就消失。
 6. **回報只要結構化狀態與結果，禁止客套與情緒安撫**。背景互相誇來誇去最燒。
-7. **上下文過一半就換一個新的對話**：換之前把要記的寫進檔案。
+7. **上下文過一半就換一個新的對話**：換之前把要記的寫進檔案（自動提醒的做法見 `slim-context`）。
 8. **「還是不行」的時候**：先拿出上一次失敗的證據；拿不出來就先查，不要叫使用者再試一次。
+
+## 為什麼要總指揮帶工人：工人是無頭的
+
+總指揮每一輪都要重讀整段對話，上下文越長，每一輪越貴。所以總指揮自己不做長篇閱讀：要改檔、掃 repo、讀 log，就寫工單，開一個**全新的無頭工人**（例如 Claude Code 的 `claude -p`，各自一個 git worktree，背景跑）。工人只讀工單，不讀總指揮跟使用者的對話，做完只回一段短結果。總指揮的上下文只留決定跟驗收。
+
+官方也是這樣建議（Anthropic〈Which Claude model should you build with?〉）：
+
+> "A lean main context matters more the bigger the main model is. Keep the expensive model's context for the decisions, and let cheaper subagents do the verbose reading."
+
+同一篇的數字：上下文 15 萬 token，每一輪光快取讀取約 0.03 美金；2 萬約 0.004 美金。
+https://claude.dev/blog/which-claude-model-should-you-build-with/
+
+分法：找檔案、跑測試、讀 log 這種**錯了一眼看得出來**的，給最小的模型；照寫成數字的工單改程式，給中等模型；方向、判斷、驗收留給總指揮。
 
 ## 為什麼
 

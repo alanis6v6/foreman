@@ -36,3 +36,7 @@ disable-model-invocation: true
 做夢的模型只看得到一天的對話，不知道前後文：一句玩笑、一個隨口的「好像可以」，它分不出是不是決定。讓它直接改記憶，錯的東西會被寫成規則。所以它只列、附原話，判斷留給懂前後文的主 agent。
 
 （我們第一晚跑，它就撿回一句主 agent 自己漏掉的話：使用者說了當天中午吃什麼。這種小事，就是隔天對方會問「你怎麼不記得」的那種。）
+
+## 來源
+
+Anthropic Research〈The components of agent memory〉：https://www.anthropic.com/research/components-of-agent-memory
