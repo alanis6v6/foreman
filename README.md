@@ -24,7 +24,7 @@
 ## 安裝
 
 ```bash
-git clone https://github.com/＿＿＿/foreman.git
+git clone https://github.com/alanis6v6/foreman.git
 # 全部裝到個人設定（每個專案都能用）
 cp -r foreman/skills/* ~/.claude/skills/
 # 或只裝到某個專案
